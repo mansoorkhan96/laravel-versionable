@@ -26,47 +26,47 @@ class Diff
         }
     }
 
-    public function toArray(array $differOptions = [], array $renderOptions = []): array
+    public function toArray(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render(null, $differOptions, $renderOptions);
+        return $this->render(null, $differOptions, $renderOptions, $stripTags);
     }
 
-    public function toText(array $differOptions = [], array $renderOptions = []): array
+    public function toText(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render('Unified', $differOptions, $renderOptions);
+        return $this->render('Unified', $differOptions, $renderOptions, $stripTags);
     }
 
-    public function toJsonText(array $differOptions = [], array $renderOptions = []): array
+    public function toJsonText(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render('JsonText', $differOptions, $renderOptions);
+        return $this->render('JsonText', $differOptions, $renderOptions, $stripTags);
     }
 
-    public function toContextText(array $differOptions = [], array $renderOptions = []): array
+    public function toContextText(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render('Context', $differOptions, $renderOptions);
+        return $this->render('Context', $differOptions, $renderOptions, $stripTags);
     }
 
-    public function toHtml(array $differOptions = [], array $renderOptions = []): array
+    public function toHtml(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render('Combined', $differOptions, $renderOptions);
+        return $this->render('Combined', $differOptions, $renderOptions, $stripTags);
     }
 
-    public function toInlineHtml(array $differOptions = [], array $renderOptions = []): array
+    public function toInlineHtml(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render('Inline', $differOptions, $renderOptions);
+        return $this->render('Inline', $differOptions, $renderOptions, $stripTags);
     }
 
-    public function toJsonHtml(array $differOptions = [], array $renderOptions = []): array
+    public function toJsonHtml(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render('JsonHtml', $differOptions, $renderOptions);
+        return $this->render('JsonHtml', $differOptions, $renderOptions, $stripTags);
     }
 
-    public function toSideBySideHtml(array $differOptions = [], array $renderOptions = []): array
+    public function toSideBySideHtml(array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
-        return $this->render('SideBySide', $differOptions, $renderOptions);
+        return $this->render('SideBySide', $differOptions, $renderOptions, $stripTags);
     }
 
-    protected function getContents(): array
+    protected function getContents(bool $stripTags = false): array
     {
         $newContents = $this->newVersion->contents;
 
@@ -88,10 +88,15 @@ class Diff
             $oldContents = $this->oldVersion->contents;
         }
 
+        if ($stripTags) {
+            $oldContents = array_map(fn ($item) => strip_tags($item), $oldContents);
+            $newContents = array_map(fn ($item) => strip_tags($item), $newContents);
+        }
+
         return [$oldContents, $newContents];
     }
 
-    public function render(?string $renderer = null, array $differOptions = [], array $renderOptions = []): array
+    public function render(string $renderer = null, array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
         if (empty($differOptions)) {
             $differOptions = $this->differOptions;
@@ -101,7 +106,7 @@ class Diff
             $renderOptions = $this->renderOptions;
         }
 
-        [$oldContents, $newContents] = $this->getContents();
+        [$oldContents, $newContents] = $this->getContents($stripTags);
 
         $diff = [];
 
@@ -126,13 +131,13 @@ class Diff
         return $diff;
     }
 
-    public function getStatistics(array $differOptions = []): array
+    public function getStatistics(array $differOptions = [], bool $stripTags = false): array
     {
         if (empty($differOptions)) {
             $differOptions = $this->differOptions;
         }
 
-        [$oldContents, $newContents] = $this->getContents();
+        [$oldContents, $newContents] = $this->getContents($stripTags);
 
         $diffStats = new Collection;
 
