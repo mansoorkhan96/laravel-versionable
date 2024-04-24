@@ -6,6 +6,8 @@ use Jfcherng\Diff\DiffHelper;
 use Overtrue\LaravelVersionable\Diff;
 use Overtrue\LaravelVersionable\Version;
 
+use function PHPUnit\Framework\assertTrue;
+
 class DiffTest extends TestCase
 {
     public function test_diff_to_array()
@@ -126,6 +128,28 @@ class DiffTest extends TestCase
             ],
             (new Diff($new, $old))->toSideBySideHtml()
         );
+    }
+
+    public function test_diff_can_strip_tags()
+    {
+        $old = new Version(['contents' => ['title' => '<p>version1</p>', 'content' => '<div>version1 content</div>']]);
+        $new = new Version(['contents' => ['title' => '<p>version2</p>', 'content' => '<div>version2 content</div>']]);
+
+        $diff = (new Diff($new, $old))->toSideBySideHtml(stripTags: true);
+
+        assertTrue(! str_contains($diff['title'], htmlspecialchars('<p>')));
+        assertTrue(! str_contains($diff['content'], htmlspecialchars('<div>')));
+    }
+
+    public function test_diff_does_not_strip_tags()
+    {
+        $old = new Version(['contents' => ['title' => '<p>version1</p>', 'content' => '<div>version1 content</div>']]);
+        $new = new Version(['contents' => ['title' => '<p>version2</p>', 'content' => '<div>version2 content</div>']]);
+
+        $diff = (new Diff($new, $old))->toSideBySideHtml(stripTags: false);
+
+        assertTrue(str_contains($diff['title'], htmlspecialchars('<p>')));
+        assertTrue(str_contains($diff['content'], htmlspecialchars('<div>')));
     }
 
     /**
