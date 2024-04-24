@@ -96,7 +96,7 @@ class Diff
         return [$oldContents, $newContents];
     }
 
-    public function render(string $renderer = null, array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
+    public function render(?string $renderer = null, array $differOptions = [], array $renderOptions = [], bool $stripTags = false): array
     {
         if (empty($differOptions)) {
             $differOptions = $this->differOptions;
