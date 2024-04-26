@@ -152,6 +152,25 @@ class DiffTest extends TestCase
         assertTrue(str_contains($diff['content'], htmlspecialchars('<div>')));
     }
 
+    public function test_diff_includes_entire_content()
+    {
+        $content = '';
+        foreach (range(1, 20) as $number) {
+            $content .= "
+                <h1>Heading-{$number}</h1>
+                <p>Para-{$number}</p>
+            ";
+        }
+
+        $old = new Version(['contents' => ['title' => '<p>version1</p>', 'content' => $content]]);
+
+        $new = new Version(['contents' => ['title' => '<p>version2</p>', 'content' => str_replace('Para-10', 'Para-10 has now changed', $content)]]);
+
+        $diff = (new Diff($new, $old))->toSideBySideHtml(stripTags: false);
+
+        assertTrue(str_contains($diff['content'], 'Para-2'));
+    }
+
     /**
      * @test
      */
