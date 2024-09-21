@@ -112,8 +112,8 @@ class Diff
 
         $createDiff = function ($key, $old, $new) use (&$diff, $renderer, $differOptions, $renderOptions) {
             if ($renderer) {
-                $old = is_string($old) ? $old : json_encode($old);
-                $new = is_string($new) ? $new : json_encode($new);
+                $old = is_string($old) ? $old : json_encode($old, JSON_PRETTY_PRINT);
+                $new = is_string($new) ? $new : json_encode($new, JSON_PRETTY_PRINT);
                 $diff[$key] = str_replace('\n No newline at end of file', '', DiffHelper::calculate($old, $new, $renderer, $differOptions, $renderOptions));
             } else {
                 $diff[$key] = compact('old', 'new');
